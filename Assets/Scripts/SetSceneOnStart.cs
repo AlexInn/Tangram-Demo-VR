@@ -32,7 +32,7 @@ public class SetSceneOnStart : MonoBehaviour
 
         if (SceneChanger.scene == 0)
         {
-            SceneChanger.scene = 2;
+            SceneChanger.scene = 1;
         }
 
         sceneTitle = GameObject.Find("Scene Title").GetComponent<Text>();
