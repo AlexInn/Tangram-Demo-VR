@@ -556,10 +556,34 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2020036785}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: IniziaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_SelectExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2020036785}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: FermaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstFocusEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -968,10 +992,34 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1446985962}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: IniziaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_SelectExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1446985962}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: FermaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstFocusEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -1208,6 +1256,18 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!114 &1446985962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6923468540352878641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 215c7bd83c8275b4aa6993fb6b76b613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1688207512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1378,6 +1438,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 415388637}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2020036785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6923468540352878642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 215c7bd83c8275b4aa6993fb6b76b613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &2028756999 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5773256366622995465, guid: 5eccbf4be2c00e94689ee8062e4e7276,
@@ -2861,30 +2933,58 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6923468540352878652}
+    - targetCorrespondingSourceObject: {fileID: 6923468540348716914, guid: bc0c4c992b2030a4085710c6a4a8d115,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6923468540352878656}
     - targetCorrespondingSourceObject: {fileID: 6923468540348716918, guid: bc0c4c992b2030a4085710c6a4a8d115,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6923468540352878651}
+    - targetCorrespondingSourceObject: {fileID: 6923468540348716918, guid: bc0c4c992b2030a4085710c6a4a8d115,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6923468540352878655}
     - targetCorrespondingSourceObject: {fileID: 6923468540348716920, guid: bc0c4c992b2030a4085710c6a4a8d115,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6923468540352878650}
+    - targetCorrespondingSourceObject: {fileID: 6923468540348716920, guid: bc0c4c992b2030a4085710c6a4a8d115,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6923468540352878654}
     - targetCorrespondingSourceObject: {fileID: 6923468540348716922, guid: bc0c4c992b2030a4085710c6a4a8d115,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6923468540352878649}
+    - targetCorrespondingSourceObject: {fileID: 6923468540348716922, guid: bc0c4c992b2030a4085710c6a4a8d115,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6923468540352878653}
     - targetCorrespondingSourceObject: {fileID: 6923468540348716924, guid: bc0c4c992b2030a4085710c6a4a8d115,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6923468540352878648}
+    - targetCorrespondingSourceObject: {fileID: 6923468540348716924, guid: bc0c4c992b2030a4085710c6a4a8d115,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6923468540352878658}
     - targetCorrespondingSourceObject: {fileID: 6923468540348716926, guid: bc0c4c992b2030a4085710c6a4a8d115,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 799813494}
+    - targetCorrespondingSourceObject: {fileID: 6923468540348716926, guid: bc0c4c992b2030a4085710c6a4a8d115,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2020036785}
     - targetCorrespondingSourceObject: {fileID: 6923468540348716800, guid: bc0c4c992b2030a4085710c6a4a8d115,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1392402579}
+    - targetCorrespondingSourceObject: {fileID: 6923468540348716800, guid: bc0c4c992b2030a4085710c6a4a8d115,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1446985962}
   m_SourcePrefab: {fileID: 100100000, guid: bc0c4c992b2030a4085710c6a4a8d115, type: 3}
 --- !u!1 &6923468540352878641 stripped
 GameObject:
@@ -2978,10 +3078,34 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878658}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: IniziaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_SelectExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878658}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: FermaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstFocusEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -3130,10 +3254,34 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878653}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: IniziaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_SelectExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878653}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: FermaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstFocusEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -3282,10 +3430,34 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878654}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: IniziaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_SelectExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878654}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: FermaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstFocusEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -3434,10 +3606,34 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878655}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: IniziaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_SelectExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878655}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: FermaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstFocusEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -3586,10 +3782,34 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878656}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: IniziaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_SelectExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6923468540352878656}
+        m_TargetAssemblyTypeName: GrabTimer, Assembly-CSharp
+        m_MethodName: FermaTimer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstFocusEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -3688,6 +3908,66 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
+--- !u!114 &6923468540352878653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6923468540352878644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 215c7bd83c8275b4aa6993fb6b76b613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6923468540352878654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6923468540352878645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 215c7bd83c8275b4aa6993fb6b76b613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6923468540352878655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6923468540352878646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 215c7bd83c8275b4aa6993fb6b76b613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6923468540352878656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6923468540352878647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 215c7bd83c8275b4aa6993fb6b76b613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6923468540352878658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6923468540352878643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 215c7bd83c8275b4aa6993fb6b76b613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
