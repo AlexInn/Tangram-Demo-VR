@@ -31,8 +31,6 @@ Impostazioni ottimizzate per VR standalone:
 * **Additional Lights Shadowmap Resolution:** 2048 (per eliminare artefatti/aliasing su luci dinamiche).
 * **Shadow Distance:** Ottimizzata per room-scale (15-20m).
 
-
-
 ## Baking & Lightmapping
 
 * **Lightmap Resolution:** Bassa/Media (Globale).
@@ -76,7 +74,6 @@ Gestione input separata per evitare conflitti:
 * **Eventi:** Iscrizione a `SelectEntered` (Presa/Grab) e `SelectExited` (Rilascio/Release) su oggetti `XRGrabInteractable`.
 * **Output:** Aggiunge dati a file CSV in `Application.persistentDataPath`.
 * **Formato Dati:** `Timestamp, EventType (GRAB/RELEASE), ObjectName`.
-
 
 ## Note di Sviluppo
 
