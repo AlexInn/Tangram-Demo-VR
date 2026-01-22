@@ -6,6 +6,9 @@
 * **OS:** Android
 * **Architettura:** ARM64
 
+## Versione Unity
+2022.3.52f3 (LTS).
+
 ## Pacchetti Core & Dipendenze
 
 * **Render Pipeline:** Universal Render Pipeline (URP)
