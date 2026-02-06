@@ -18,7 +18,14 @@ public class TangramLogger : MonoBehaviour
         if (!File.Exists(filePath))
         {
             // Usa il punto e virgola (;) per Excel italiano
-            File.AppendAllText(filePath, "Timestamp;Event;ObjectName\n");
+            File.AppendAllText(filePath, "Date;Time;Event;ObjectName\n");
+        }
+        else
+        {
+            // Se il file esiste già, inserisce una riga vuota per staccare visivamente la vecchia sessione
+            File.AppendAllText(filePath, "\n");
+            File.AppendAllText(filePath, $"\n;--- SESSIONE DEL {System.DateTime.Now} ---;\n");
+            File.AppendAllText(filePath, "Date;Time;Event;ObjectName\n");
         }
 
         Debug.Log($"[CSV] Logger avviato. File: {filePath}");
@@ -39,15 +46,22 @@ public class TangramLogger : MonoBehaviour
     }
 
     // Funzione principale di scrittura
-    public void LogInteraction(string eventType, string objectName)
+    void LogInteraction(string eventType, string objectName)
     {
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        string line = $"{timestamp};{eventType};{objectName}\n";
+        // 1. Data formato italiano (giorno/mese/anno)
+        string datePart = System.DateTime.Now.ToString("dd/MM/yyyy");
 
+        // 2. Ora con secondi (24h)
+        string timePart = System.DateTime.Now.ToString("HH:mm:ss");
+
+        // 3. Componiamo la riga con 4 colonne: Data ; Ora ; Evento ; Oggetto
+        string line = $"{datePart};{timePart};{eventType};{objectName}\n";
+
+        // Scriviamo sul file
         try
         {
             File.AppendAllText(filePath, line);
-            // Debug.Log($"[LOG] {line.Trim()}"); // De-commenta se vuoi vedere i log in console
+            Debug.Log($"[LOG] {line.Trim()}"); // Log in console
         }
         catch (Exception e)
         {
@@ -59,7 +73,7 @@ public class TangramLogger : MonoBehaviour
     // Da collegare all'evento OnWin del TangramPatternMatcher
     public void LogVictory()
     {
-        LogInteraction("WIN", "Puzzle Completed");
+        LogInteraction("FINE", "Tangram completato");
         Debug.Log("Vittoria registrata nel CSV!");
     }
 }

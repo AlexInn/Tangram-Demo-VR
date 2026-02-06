@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class TangramPatternMatcher : MonoBehaviour
 {
@@ -51,27 +52,34 @@ public class TangramPatternMatcher : MonoBehaviour
     {
         if (anchorPiece == null) return false;
 
-        // Controlliamo ogni pezzo salvato nella soluzione
         foreach (var relation in solvedPattern)
         {
             Transform currentPiece = relation.pieceObject;
 
             if (currentPiece == null) continue;
 
-            // 1. Calcoliamo dove si trova ORA questo pezzo RISPETTO all'Anchor
+            // --- NUOVO CONTROLLO: IL PEZZO È IN MANO? ---
+            // Cerchiamo il componente che gestisce la presa (XRGrabInteractable)
+            var grabInteractable = currentPiece.GetComponent<XRGrabInteractable>();
+
+            // Se il componente esiste ED è selezionato (cioè in mano), BLOCCA la vittoria.
+            if (grabInteractable != null && grabInteractable.isSelected)
+            {
+                return false; // "È giusto, ma lo hai ancora in mano. Non valido."
+            }
+            // ---------------------------------------------
+
+            // 1. Calcoli relativi
             Vector3 currentRelPos = anchorPiece.InverseTransformPoint(currentPiece.position);
             Quaternion currentRelRot = Quaternion.Inverse(anchorPiece.rotation) * currentPiece.rotation;
 
-            // 2. Controlliamo la Distanza
-            float dist = Vector3.Distance(currentRelPos, relation.targetLocalPosition);
-            if (dist > positionThreshold) return false; // Troppo lontano
+            // 2. Distanza
+            if (Vector3.Distance(currentRelPos, relation.targetLocalPosition) > positionThreshold) return false;
 
-            // 3. Controlliamo la Rotazione
-            float angle = Quaternion.Angle(currentRelRot, relation.targetLocalRotation);
-            if (angle > rotationThreshold) return false; // Ruotato male
+            // 3. Rotazione
+            if (Quaternion.Angle(currentRelRot, relation.targetLocalRotation) > rotationThreshold) return false;
         }
 
-        // Se siamo arrivati qui, tutti i pezzi sono al posto giusto!
         return true;
     }
 
