@@ -52,6 +52,12 @@ public class TangramPatternMatcher : MonoBehaviour
     {
         if (anchorPiece == null) return false;
 
+        // --- AGGIUNTA NECESSARIA: Controllo anche l'Anchor Piece ---
+        // Anche il pezzo "Capo" deve essere stato rilasciato per vincere
+        var anchorGrab = anchorPiece.GetComponent<XRGrabInteractable>();
+        if (anchorGrab != null && anchorGrab.isSelected) return false;
+        // -----------------------------------------------------------
+
         foreach (var relation in solvedPattern)
         {
             Transform currentPiece = relation.pieceObject;
