@@ -97,7 +97,6 @@ public class HeadGazeTracker : MonoBehaviour
 
         // --- SCRITTURA NEL CSV ---
         // Scriviamo: Evento="GAZE", Oggetto="NomeZona", Extra="Durata"
-        // Nota: Dovrai aggiornare il tuo Logger per accettare la durata, vedi sotto.
         if (logger != null)
         {
             logger.LogGaze(zone.zoneName, duration);
