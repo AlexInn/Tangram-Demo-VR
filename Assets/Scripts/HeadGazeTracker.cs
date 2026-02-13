@@ -4,7 +4,11 @@ public class HeadGazeTracker : MonoBehaviour
 {
     [Header("Impostazioni Raycast")]
     public float maxDistance = 20f; // Quanto lontano vede il giocatore
-    public LayerMask layerMask;     // Quali layer può colpire (es. 'Default' o crea un layer 'Gaze')
+    public LayerMask layerMask;     // Quali layer può colpire
+
+    [Header("Filtri Anti-Spam")]
+    [Tooltip("Ignora qualsiasi sguardo nei primi X secondi (tempo per inizializzare il visore)")]
+    public float warmupTime = 1.0f;
 
     [Header("Debug")]
     [SerializeField] private string currentLookingAt = "Niente";
@@ -14,7 +18,7 @@ public class HeadGazeTracker : MonoBehaviour
     private InterestZone currentZone = null;
     private float gazeStartTime;
 
-    // Riferimento al Logger (lo script che scrive il CSV)
+    // Riferimento al Logger
     private TangramLogger logger;
 
     void Start()
@@ -28,6 +32,11 @@ public class HeadGazeTracker : MonoBehaviour
 
     void Update()
     {
+        // --- FILTRO WARMUP ---
+        // Se il gioco è appena iniziato (visore non calibrato), non fare nulla.
+        // Questo impedisce la creazione del file immediata.
+        if (Time.time < warmupTime) return;
+
         // 1. Spara il raggio dal centro della telecamera in avanti
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit hit;
@@ -80,9 +89,6 @@ public class HeadGazeTracker : MonoBehaviour
         currentLookingAt = zone.zoneName;
         currentGazeTimer = 0f;
 
-        // Opzionale: Logga l'inizio (se vuoi un file molto dettagliato)
-        // logger.LogInteraction("GAZE_START", zone.zoneName);
-
         // Incrementa il contatore interno della zona
         zone.gazeCount++;
     }
@@ -96,7 +102,7 @@ public class HeadGazeTracker : MonoBehaviour
         zone.totalGazeDuration += duration;
 
         // --- SCRITTURA NEL CSV ---
-        // Scriviamo: Evento="GAZE", Oggetto="NomeZona", Extra="Durata"
+        // Scrive sempre, senza soglia minima
         if (logger != null)
         {
             logger.LogGaze(zone.zoneName, duration);
