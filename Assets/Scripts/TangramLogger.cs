@@ -20,17 +20,47 @@ public class TangramLogger : MonoBehaviour
 
     void Start()
     {
-        // 1. GENERAZIONE CODICE UNIVOCO (Lo facciamo subito, serve per la UI)
+        // 1. GENERAZIONE CODICE UNIVOCO
         currentSessionID = UnityEngine.Random.Range(1000, 10000).ToString();
-
-        // 2. Definisce il percorso
         string fileName = $"Tangram_Session_{currentSessionID}.csv";
-        filePath = Path.Combine(Application.persistentDataPath, fileName);
 
-        // <--- NOTA: Non creiamo più il file qui! Lo faremo al primo evento.
-        Debug.Log($"[CSV] Logger pronto. Sessione: {currentSessionID}. File: {filePath}");
+        // 2. DEFINIZIONE PERCORSO INTELLIGENTE
+        string folderPath = "";
 
-        // 3. AUTOMAZIONE INTERAZIONI
+#if UNITY_EDITOR
+        // EDITOR: Crea una cartella "Logs" dentro il progetto per non fare disordine
+        folderPath = Path.Combine(Application.dataPath, "Session_Logs");
+#elif UNITY_ANDROID
+        // CASO B: Su QUEST -> Cartella pubblica "Documents" (Accessibile via USB)
+        // Percorso: "Questo PC\Quest 3\Memoria condivisa interna\Documents\TangramVR_Logs"
+        folderPath = "/storage/emulated/0/Documents/TangramVR_Logs";
+#else
+        // CASO C: Su PC (Build .exe) -> Cartella "Documenti" di Windows
+        folderPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "TangramVR_Logs");
+#endif
+
+        // 3. CREAZIONE CARTELLA (Se non esiste)
+        try
+        {
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+        }
+        catch (Exception e)
+        {
+            // Se fallisce (es. permessi), torna al percorso sicuro di default
+            Debug.LogError($"Impossibile creare cartella custom: {e.Message}. Uso default.");
+            folderPath = Application.persistentDataPath;
+        }
+
+        // Combina cartella e nome file
+        filePath = Path.Combine(folderPath, fileName);
+
+        // <--- Log per farti capire dove sta salvando
+        Debug.Log($"[CSV] Logger pronto. Sessione: {currentSessionID}. \nFILE: {filePath}");
+
+        // 4. AUTOMAZIONE INTERAZIONI (Resto del codice invariato...)
         var interactables = FindObjectsOfType<XRGrabInteractable>();
         foreach (var interactable in interactables)
         {
