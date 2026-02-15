@@ -7,39 +7,32 @@ using System.Collections.Generic;
 public class TangramLogger : MonoBehaviour
 {
     private string filePath;
-
-    // Codice univoco della sessione (pubblico per essere letto dalla UI)
     public string currentSessionID;
 
     private bool isLoggingActive = true;
-
-    // <--- NUOVO: Flag per sapere se abbiamo già creato il file fisico
     private bool fileCreated = false;
 
     private Dictionary<XRGrabInteractable, float> grabStartTimes = new Dictionary<XRGrabInteractable, float>();
 
-    void Start()
+    // SPOSTATO IN AWAKE: Viene eseguito PRIMA di qualsiasi Start() degli altri script
+    void Awake()
     {
-        // 1. GENERAZIONE CODICE UNIVOCO
+        // 1. GENERAZIONE CODICE
         currentSessionID = UnityEngine.Random.Range(1000, 10000).ToString();
         string fileName = $"Tangram_Session_{currentSessionID}.csv";
 
-        // 2. DEFINIZIONE PERCORSO INTELLIGENTE
+        // 2. DEFINIZIONE PERCORSO
         string folderPath = "";
 
 #if UNITY_EDITOR
-        // EDITOR: Crea una cartella "Logs" dentro il progetto per non fare disordine
-        folderPath = Path.Combine(Application.dataPath, "Session_Logs");
+        folderPath = Path.Combine(Application.dataPath, "Logs"); 
 #elif UNITY_ANDROID
-        // CASO B: Su QUEST -> Cartella pubblica "Documents" (Accessibile via USB)
-        // Percorso: "Questo PC\Quest 3\Memoria condivisa interna\Documents\TangramVR_Logs"
         folderPath = "/storage/emulated/0/Documents/TangramVR_Logs";
 #else
-        // CASO C: Su PC (Build .exe) -> Cartella "Documenti" di Windows
         folderPath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "TangramVR_Logs");
 #endif
 
-        // 3. CREAZIONE CARTELLA (Se non esiste)
+        // 3. CREAZIONE CARTELLA
         try
         {
             if (!Directory.Exists(folderPath))
@@ -49,18 +42,18 @@ public class TangramLogger : MonoBehaviour
         }
         catch (Exception e)
         {
-            // Se fallisce (es. permessi), torna al percorso sicuro di default
-            Debug.LogError($"Impossibile creare cartella custom: {e.Message}. Uso default.");
+            Debug.LogError($"Errore cartella: {e.Message}");
             folderPath = Application.persistentDataPath;
         }
 
-        // Combina cartella e nome file
         filePath = Path.Combine(folderPath, fileName);
 
-        // <--- Log per farti capire dove sta salvando
-        Debug.Log($"[CSV] Logger pronto. Sessione: {currentSessionID}. \nFILE: {filePath}");
+        Debug.Log($"[CSV] Logger inizializzato in Awake. ID: {currentSessionID}");
+    }
 
-        // 4. AUTOMAZIONE INTERAZIONI (Resto del codice invariato...)
+    void Start()
+    {
+        // 4. AUTOMAZIONE INTERAZIONI (Questo può restare in Start)
         var interactables = FindObjectsOfType<XRGrabInteractable>();
         foreach (var interactable in interactables)
         {
@@ -69,19 +62,20 @@ public class TangramLogger : MonoBehaviour
         }
     }
 
-    // --- HELPER PRIVATO PER CREARE IL FILE ---
+    // --- DA QUI IN GIU' E' TUTTO UGUALE A PRIMA ---
+
     void CreateFileHeader()
     {
         string header = "Date;Time;Event;ObjectName;Duration\n";
         try
         {
             File.WriteAllText(filePath, header);
-            fileCreated = true; // Segniamo che il file esiste
-            Debug.Log($"[CSV] File creato fisicamente ora: {filePath}");
+            fileCreated = true;
+            Debug.Log($"[CSV] File creato fisicamente: {filePath}");
         }
         catch (Exception e)
         {
-            Debug.LogError($"Errore creazione file: {e.Message}");
+            Debug.LogError($"Errore creazione file CSV: {e.Message}");
         }
     }
 
@@ -90,13 +84,9 @@ public class TangramLogger : MonoBehaviour
         if (!isLoggingActive) return;
 
         if (!grabStartTimes.ContainsKey(item))
-        {
             grabStartTimes.Add(item, Time.time);
-        }
         else
-        {
             grabStartTimes[item] = Time.time;
-        }
     }
 
     void OnGrabEnd(XRGrabInteractable item)
@@ -105,10 +95,8 @@ public class TangramLogger : MonoBehaviour
 
         if (grabStartTimes.ContainsKey(item))
         {
-            float startTime = grabStartTimes[item];
-            float duration = Time.time - startTime;
+            float duration = Time.time - grabStartTimes[item];
             grabStartTimes.Remove(item);
-
             LogData("GRAB", item.name, duration);
         }
     }
@@ -117,7 +105,7 @@ public class TangramLogger : MonoBehaviour
     {
         if (!isLoggingActive) return;
 
-        // <--- MODIFICA: Se è la prima volta che scriviamo, crea il file
+        // Se è la prima volta che scriviamo qualcosa (anche INFO), crea il file
         if (!fileCreated)
         {
             CreateFileHeader();
@@ -135,7 +123,11 @@ public class TangramLogger : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError($"Errore scrittura CSV: {e.Message}");
+            // Protezione extra nel caso il path fosse ancora null (non dovrebbe più succedere)
+            if (string.IsNullOrEmpty(filePath))
+                Debug.LogError("FilePath è null! Awake non ha funzionato correttamente.");
+            else
+                Debug.LogError($"Errore scrittura: {e.Message}");
         }
     }
 
@@ -147,11 +139,8 @@ public class TangramLogger : MonoBehaviour
     public void LogVictory()
     {
         if (!isLoggingActive) return;
-
         LogData("FINE", "Tangram completato", 0f);
-
         isLoggingActive = false;
-
-        Debug.Log($"Vittoria registrata! Codice Sessione: {currentSessionID}");
+        Debug.Log($"Vittoria! Sessione conclusa: {currentSessionID}");
     }
 }

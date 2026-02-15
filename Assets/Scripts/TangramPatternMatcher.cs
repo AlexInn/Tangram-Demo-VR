@@ -1,119 +1,103 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.Events;
+using System.Collections.Generic;
 
 public class TangramPatternMatcher : MonoBehaviour
 {
-    // Struttura semplice: salva Chi è, Dove va e Come è girato
     [System.Serializable]
-    public struct PieceRelation
+    public struct PieceGoal
     {
-        public Transform pieceObject;
-        public Vector3 targetLocalPosition;
-        public Quaternion targetLocalRotation;
+        public string pieceTag;
+        public Vector3 relPosition;
+        public Quaternion relRotation;
     }
 
     [Header("Configurazione")]
-    [Tooltip("Il pezzo 'Capo'. Tutti gli altri verranno calcolati in base alla posizione di questo.")]
-    public Transform anchorPiece;
+    public XRGrabInteractable anchorPiece;
+    public List<XRGrabInteractable> otherPieces;
+    public float positionTolerance = 0.05f;
+    public float rotationTolerance = 15f;
 
-    [Tooltip("Lista degli altri pezzi del Tangram")]
-    public List<Transform> otherPieces;
-
-    [Header("Tolleranza")]
-    [Tooltip("Quanto può sbagliare l'utente in metri (es. 0.05 = 5cm)")]
-    public float positionThreshold = 0.05f;
-    [Tooltip("Quanto può sbagliare la rotazione in gradi")]
-    public float rotationThreshold = 20.0f;
-
-    [Header("Dati Salvati (Non toccare a mano)")]
-    public List<PieceRelation> solvedPattern;
+    [Header("Soluzione Salvata (Smart)")]
+    [SerializeField] private List<PieceGoal> savedSolution = new List<PieceGoal>();
 
     [Header("Eventi")]
     public UnityEvent OnWin;
-
     private bool hasWon = false;
+    public string levelName = "Livello Tangram Cigno";
+
+    void Start()
+    {
+        TangramLogger logger = FindObjectOfType<TangramLogger>();
+        if (logger != null) logger.LogData("INFO", "Start_Level: " + levelName, 0f);
+    }
 
     void Update()
     {
-        if (hasWon) return; // Se ha già vinto, fermiamo i controlli
+        if (hasWon) return;
 
         if (CheckPattern())
         {
             hasWon = true;
-            Debug.Log("VITTORIA! Forma riconosciuta.");
-            OnWin.Invoke(); // Fa partire Suono e Logger
+            Debug.Log("VITTORIA! Pattern Corretto.");
+            OnWin.Invoke();
+            TangramLogger logger = FindObjectOfType<TangramLogger>();
+            if (logger != null) logger.LogVictory();
         }
     }
 
-    // Algoritmo di verifica Semplice (Strict)
-    private bool CheckPattern()
+    bool CheckPattern()
     {
-        if (anchorPiece == null) return false;
+        if (anchorPiece.isSelected) return false;
 
-        // --- AGGIUNTA NECESSARIA: Controllo anche l'Anchor Piece ---
-        // Anche il pezzo "Capo" deve essere stato rilasciato per vincere
-        var anchorGrab = anchorPiece.GetComponent<XRGrabInteractable>();
-        if (anchorGrab != null && anchorGrab.isSelected) return false;
-        // -----------------------------------------------------------
-
-        foreach (var relation in solvedPattern)
-        {
-            Transform currentPiece = relation.pieceObject;
-
-            if (currentPiece == null) continue;
-
-            // --- NUOVO CONTROLLO: IL PEZZO È IN MANO? ---
-            // Cerchiamo il componente che gestisce la presa (XRGrabInteractable)
-            var grabInteractable = currentPiece.GetComponent<XRGrabInteractable>();
-
-            // Se il componente esiste ED è selezionato (cioè in mano), BLOCCA la vittoria.
-            if (grabInteractable != null && grabInteractable.isSelected)
-            {
-                return false; // "È giusto, ma lo hai ancora in mano. Non valido."
-            }
-            // ---------------------------------------------
-
-            // 1. Calcoli relativi
-            Vector3 currentRelPos = anchorPiece.InverseTransformPoint(currentPiece.position);
-            Quaternion currentRelRot = Quaternion.Inverse(anchorPiece.rotation) * currentPiece.rotation;
-
-            // 2. Distanza
-            if (Vector3.Distance(currentRelPos, relation.targetLocalPosition) > positionThreshold) return false;
-
-            // 3. Rotazione
-            if (Quaternion.Angle(currentRelRot, relation.targetLocalRotation) > rotationThreshold) return false;
-        }
-
-        return true;
-    }
-
-    // --- FUNZIONI PER L'EDITOR ---
-
-    [ContextMenu("SALVA SOLUZIONE")]
-    public void BakeSolution()
-    {
-        solvedPattern.Clear();
-
-        if (anchorPiece == null)
-        {
-            Debug.LogError("Devi assegnare un Anchor Piece prima di salvare!");
-            return;
-        }
+        List<int> availableGoalIndices = new List<int>();
+        for (int i = 0; i < savedSolution.Count; i++) availableGoalIndices.Add(i);
 
         foreach (var piece in otherPieces)
         {
-            PieceRelation data = new PieceRelation();
-            data.pieceObject = piece;
+            if (piece.isSelected) return false;
 
-            // Matematica relativa
-            data.targetLocalPosition = anchorPiece.InverseTransformPoint(piece.position);
-            data.targetLocalRotation = Quaternion.Inverse(anchorPiece.rotation) * piece.rotation;
+            bool pieceMatched = false;
+            Vector3 currentRelPos = anchorPiece.transform.InverseTransformPoint(piece.transform.position);
+            Quaternion currentRelRot = Quaternion.Inverse(anchorPiece.transform.rotation) * piece.transform.rotation;
 
-            solvedPattern.Add(data);
+            for (int j = 0; j < availableGoalIndices.Count; j++)
+            {
+                int goalIdx = availableGoalIndices[j];
+                PieceGoal goal = savedSolution[goalIdx];
+
+                if (piece.CompareTag(goal.pieceTag))
+                {
+                    float dist = Vector3.Distance(currentRelPos, goal.relPosition);
+                    float angle = Quaternion.Angle(currentRelRot, goal.relRotation);
+
+                    if (dist <= positionTolerance && angle <= rotationTolerance)
+                    {
+                        availableGoalIndices.RemoveAt(j);
+                        pieceMatched = true;
+                        break;
+                    }
+                }
+            }
+            if (!pieceMatched) return false;
         }
+        return availableGoalIndices.Count == 0;
+    }
 
-        Debug.Log($"Soluzione salvata con {solvedPattern.Count} pezzi relativi all'Anchor.");
+    [ContextMenu("Bake Solution")]
+    public void BakeSolution()
+    {
+        if (anchorPiece == null) return;
+        savedSolution.Clear();
+        foreach (var piece in otherPieces)
+        {
+            PieceGoal newGoal = new PieceGoal();
+            newGoal.pieceTag = piece.tag;
+            newGoal.relPosition = anchorPiece.transform.InverseTransformPoint(piece.transform.position);
+            newGoal.relRotation = Quaternion.Inverse(anchorPiece.transform.rotation) * piece.transform.rotation;
+            savedSolution.Add(newGoal);
+        }
+        Debug.Log("Bake completato con successo!");
     }
 }

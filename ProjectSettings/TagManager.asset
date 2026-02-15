@@ -4,15 +4,11 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - projectile
-  - FxTemporaire
-  - ScoreStore
-  - itemChild
-  - pit
   - subMenu
   - mainMenu
-  - shapes
-  - answer
+  - generic_shape
+  - triangle_big
+  - triangle_small
   layers:
   - Default
   - TransparentFX
