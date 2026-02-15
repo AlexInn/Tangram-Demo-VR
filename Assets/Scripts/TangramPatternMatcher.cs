@@ -5,99 +5,165 @@ using System.Collections.Generic;
 
 public class TangramPatternMatcher : MonoBehaviour
 {
+    // Struttura dati per salvare la posizione di un pezzo
     [System.Serializable]
     public struct PieceGoal
     {
+        [Tooltip("Il Tag del pezzo (es. 'TriangoloGrande'). Serve per permettere lo scambio tra pezzi uguali.")]
         public string pieceTag;
+
+        [Tooltip("Posizione relativa rispetto all'Anchor.")]
         public Vector3 relPosition;
+
+        [Tooltip("Rotazione relativa rispetto all'Anchor.")]
         public Quaternion relRotation;
     }
 
-    [Header("Configurazione")]
+    [Header("--- Configurazione Pezzi ---")]
+    [Tooltip("Il pezzo 'Capo' (es. il Quadrato). La posizione di tutti gli altri pezzi viene calcolata rispetto a questo. Se muovi l'Anchor, la soluzione si sposta con lui.")]
     public XRGrabInteractable anchorPiece;
+
+    [Tooltip("Lista di tutti gli altri pezzi del Tangram che devono essere posizionati.")]
     public List<XRGrabInteractable> otherPieces;
+
+    [Header("--- Tolleranza ---")]
+    [Tooltip("Quanto può essere impreciso il giocatore nella POSIZIONE (in metri)? Es. 0.05 = 5cm.")]
     public float positionTolerance = 0.05f;
+
+    [Tooltip("Quanto può essere impreciso il giocatore nella ROTAZIONE (in gradi)?")]
     public float rotationTolerance = 15f;
 
-    [Header("Soluzione Salvata (Smart)")]
+    [Header("--- Soluzione (Non toccare a mano) ---")]
+    [Tooltip("Questa lista si riempie automaticamente quando premi 'Bake Solution'. Contiene le coordinate vincenti relative.")]
     [SerializeField] private List<PieceGoal> savedSolution = new List<PieceGoal>();
 
-    [Header("Eventi")]
+    [Header("--- Eventi & Setup ---")]
+    [Tooltip("Cosa succede quando vinci? (Suoni, effetti particellari, attivazione bottoni, ecc.)")]
     public UnityEvent OnWin;
-    private bool hasWon = false;
+
+    [Tooltip("Nome del livello da scrivere nel file di Log (es. 'Cigno', 'Gatto').")]
     public string levelName = "Livello Tangram Cigno";
+
+    // Variabile interna per bloccare il controllo dopo la vittoria
+    private bool hasWon = false;
 
     void Start()
     {
+        // All'avvio, cerchiamo il Logger e scriviamo che il livello è iniziato
         TangramLogger logger = FindObjectOfType<TangramLogger>();
-        if (logger != null) logger.LogData("INFO", "Start_Level: " + levelName, 0f);
+        if (logger != null)
+        {
+            // Nota: LogData gestisce automaticamente la creazione del file se non esiste
+            logger.LogData("INFO", "Start_Level: " + levelName, 0f);
+        }
     }
 
     void Update()
     {
+        // Se abbiamo già vinto, non facciamo più controlli (risparmia risorse)
         if (hasWon) return;
 
+        // Controlliamo se il pattern è corretto
         if (CheckPattern())
         {
             hasWon = true;
-            Debug.Log("VITTORIA! Pattern Corretto.");
+            Debug.Log($"VITTORIA! Livello {levelName} completato.");
+
+            // Scatena gli eventi Unity (es. Audio, FX)
             OnWin.Invoke();
+
+            // Scrive la vittoria definitiva nel CSV e ferma il logging
             TangramLogger logger = FindObjectOfType<TangramLogger>();
             if (logger != null) logger.LogVictory();
         }
     }
 
+    // --- LOGICA CORE: SMART MATCHING ---
+    // Questa funzione permette di scambiare pezzi uguali (es. due triangoli grandi)
+    // purché abbiano lo stesso TAG.
     bool CheckPattern()
     {
+        // 1. REGOLA FERREA: Non puoi vincere se stai ancora tenendo in mano il pezzo Anchor
         if (anchorPiece.isSelected) return false;
 
+        // Creiamo una lista di indici dei "bersagli" (slot) disponibili.
+        // Man mano che un pezzo trova il suo posto, rimuoviamo lo slot dalla lista.
         List<int> availableGoalIndices = new List<int>();
         for (int i = 0; i < savedSolution.Count; i++) availableGoalIndices.Add(i);
 
+        // Controlliamo ogni pezzo fisico presente sulla scena
         foreach (var piece in otherPieces)
         {
+            // 2. REGOLA FERREA: Se hai un pezzo in mano, non puoi vincere
             if (piece.isSelected) return false;
 
             bool pieceMatched = false;
+
+            // Calcoliamo dove si trova questo pezzo RISPETTO all'Anchor
             Vector3 currentRelPos = anchorPiece.transform.InverseTransformPoint(piece.transform.position);
             Quaternion currentRelRot = Quaternion.Inverse(anchorPiece.transform.rotation) * piece.transform.rotation;
 
+            // Cerchiamo tra gli slot rimasti vuoti se ce n'è uno compatibile
             for (int j = 0; j < availableGoalIndices.Count; j++)
             {
                 int goalIdx = availableGoalIndices[j];
                 PieceGoal goal = savedSolution[goalIdx];
 
+                // A. Il Tag deve corrispondere (es. Triangolo == Triangolo)
                 if (piece.CompareTag(goal.pieceTag))
                 {
+                    // B. Calcoliamo la distanza e l'errore angolare
                     float dist = Vector3.Distance(currentRelPos, goal.relPosition);
                     float angle = Quaternion.Angle(currentRelRot, goal.relRotation);
 
+                    // C. Verifichiamo se siamo entro la tolleranza
                     if (dist <= positionTolerance && angle <= rotationTolerance)
                     {
-                        availableGoalIndices.RemoveAt(j);
+                        // TROVATO! Questo pezzo occupa questo slot.
+                        availableGoalIndices.RemoveAt(j); // Rimuoviamo lo slot perché è occupato
                         pieceMatched = true;
-                        break;
+                        break; // Passiamo al prossimo pezzo fisico
                     }
                 }
             }
+
+            // Se il pezzo corrente non ha trovato NESSUNO slot valido, abbiamo fallito.
             if (!pieceMatched) return false;
         }
+
+        // Se tutti gli slot sono stati riempiti (count == 0), abbiamo vinto!
         return availableGoalIndices.Count == 0;
     }
 
+    // --- FUNZIONE PER L'EDITOR ---
+    // Tasto destro sul nome dello script -> "Bake Solution"
     [ContextMenu("Bake Solution")]
     public void BakeSolution()
     {
-        if (anchorPiece == null) return;
+        if (anchorPiece == null)
+        {
+            Debug.LogError("ERRORE: Devi assegnare l'Anchor Piece prima di fare il Bake!");
+            return;
+        }
+
+        // Pulisce la vecchia soluzione
         savedSolution.Clear();
+
+        // Salva la posizione relativa di ogni pezzo
         foreach (var piece in otherPieces)
         {
             PieceGoal newGoal = new PieceGoal();
+
+            // IMPORTANTE: Salva il Tag per permettere lo scambio di pezzi uguali
             newGoal.pieceTag = piece.tag;
+
+            // Calcoli relativi all'Anchor
             newGoal.relPosition = anchorPiece.transform.InverseTransformPoint(piece.transform.position);
             newGoal.relRotation = Quaternion.Inverse(anchorPiece.transform.rotation) * piece.transform.rotation;
+
             savedSolution.Add(newGoal);
         }
-        Debug.Log("Bake completato con successo!");
+
+        Debug.Log($"Bake completato! Salvati {savedSolution.Count} pezzi per la soluzione '{levelName}'.");
     }
 }
