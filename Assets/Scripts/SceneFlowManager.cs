@@ -3,22 +3,26 @@ using UnityEngine.SceneManagement;
 
 public class SceneFlowManager : MonoBehaviour
 {
-    [Header("Nomi delle Scene")]
-    [Tooltip("Scrivi qui il nome ESATTO della scena dove si gioca (es. 'TangramGame')")]
-    public string gameSceneName = "TangramGame";
-
-    [Tooltip("Scrivi qui il nome ESATTO della scena di menu (es. 'StartMenu')")]
+    [Header("Configurazione")]
+    [Tooltip("Nome esatto della scena del Menu Principale")]
     public string menuSceneName = "StartMenu";
 
-    // Chiama questa funzione dal pulsante "AVVIA SESSIONE"
-    public void LoadGame()
+    // Funzione per caricare un livello specifico (da collegare ai bottoni del Menu)
+    public void LoadLevel(string levelName)
     {
-        SceneManager.LoadScene(gameSceneName);
+        SceneManager.LoadScene(levelName);
     }
 
-    // Chiama questa funzione dal pulsante "TORNA AL MENU" (a fine partita)
+    // Funzione per tornare al menu (da collegare al bottone di fine partita)
     public void LoadMenu()
     {
         SceneManager.LoadScene(menuSceneName);
+    }
+
+    // Funzione per uscire dal gioco
+    public void QuitGame()
+    {
+        Debug.Log("Uscita dal gioco...");
+        Application.Quit();
     }
 }
