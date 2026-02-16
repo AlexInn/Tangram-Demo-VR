@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using System.IO; // <--- Necessario per leggere e scrivere file
 
 public class TangramPatternMatcher : MonoBehaviour
 {
@@ -19,6 +20,17 @@ public class TangramPatternMatcher : MonoBehaviour
         public Quaternion relRotation;
     }
 
+    // --- NUOVA CLASSE PER IL SALVATAGGIO JSON ---
+    // Serve a impacchettare tutti i dati del livello in un unico oggetto scrivibile
+    [System.Serializable]
+    public class LevelData
+    {
+        public string levelName;
+        public float posTolerance;
+        public float rotTolerance;
+        public List<PieceGoal> goals;
+    }
+
     [Header("--- Configurazione Pezzi ---")]
     [Tooltip("Il pezzo 'Capo' (es. il Quadrato). La posizione di tutti gli altri pezzi viene calcolata rispetto a questo. Se muovi l'Anchor, la soluzione si sposta con lui.")]
     public XRGrabInteractable anchorPiece;
@@ -33,8 +45,12 @@ public class TangramPatternMatcher : MonoBehaviour
     [Tooltip("Quanto può essere impreciso il giocatore nella ROTAZIONE (in gradi)?")]
     public float rotationTolerance = 15f;
 
+    [Header("--- Gestione File JSON (Nuovo) ---")]
+    [Tooltip("Nome del file da salvare o caricare (es. 'livello_cigno'). Non serve scrivere .json")]
+    public string jsonFileName = "nuovo_livello";
+
     [Header("--- Soluzione (Non toccare a mano) ---")]
-    [Tooltip("Questa lista si riempie automaticamente quando premi 'Bake Solution'. Contiene le coordinate vincenti relative.")]
+    [Tooltip("Questa lista si riempie automaticamente quando premi 'Bake Solution' o carichi un JSON.")]
     [SerializeField] private List<PieceGoal> savedSolution = new List<PieceGoal>();
 
     [Header("--- Eventi & Setup ---")]
@@ -87,7 +103,6 @@ public class TangramPatternMatcher : MonoBehaviour
         if (anchorPiece.isSelected) return false;
 
         // Creiamo una lista di indici dei "bersagli" (slot) disponibili.
-        // Man mano che un pezzo trova il suo posto, rimuoviamo lo slot dalla lista.
         List<int> availableGoalIndices = new List<int>();
         for (int i = 0; i < savedSolution.Count; i++) availableGoalIndices.Add(i);
 
@@ -135,9 +150,12 @@ public class TangramPatternMatcher : MonoBehaviour
         return availableGoalIndices.Count == 0;
     }
 
-    // --- FUNZIONE PER L'EDITOR ---
-    // Tasto destro sul nome dello script -> "Bake Solution"
-    [ContextMenu("Bake Solution")]
+    // =========================================================
+    // MENU CONTESTUALI (Tasto Destro sullo script nell'Inspector)
+    // =========================================================
+
+    // 1. BAKE: Salva la posizione attuale dei pezzi nella memoria RAM (lista Inspector)
+    [ContextMenu("1. Bake Solution (Memoria)")]
     public void BakeSolution()
     {
         if (anchorPiece == null)
@@ -164,6 +182,78 @@ public class TangramPatternMatcher : MonoBehaviour
             savedSolution.Add(newGoal);
         }
 
-        Debug.Log($"Bake completato! Salvati {savedSolution.Count} pezzi per la soluzione '{levelName}'.");
+        Debug.Log($"Bake completato! Salvati {savedSolution.Count} pezzi per la soluzione '{levelName}'. Ora puoi salvare su File.");
+    }
+
+    // 2. SAVE: Prende la memoria RAM e la scrive su un file JSON
+    [ContextMenu("2. Save Level to JSON")]
+    public void SaveLevelToFile()
+    {
+        if (savedSolution.Count == 0)
+        {
+            Debug.LogError("La soluzione è vuota! Fai prima 'Bake Solution'.");
+            return;
+        }
+
+        // Creiamo l'oggetto wrapper
+        LevelData data = new LevelData();
+        data.levelName = this.levelName;
+        data.posTolerance = this.positionTolerance;
+        data.rotTolerance = this.rotationTolerance;
+        data.goals = this.savedSolution;
+
+        // Convertiamo in testo JSON
+        string json = JsonUtility.ToJson(data, true);
+        string path = GetFilePath();
+
+        // Scriviamo su disco
+        File.WriteAllText(path, json);
+        Debug.Log($"Livello salvato correttamente in: {path}");
+
+#if UNITY_EDITOR
+        // Aggiorna la finestra Project di Unity per far apparire il file subito
+        UnityEditor.AssetDatabase.Refresh();
+#endif
+    }
+
+    // 3. LOAD: Legge il file JSON e sovrascrive le impostazioni dello script
+    [ContextMenu("3. Load Level from JSON")]
+    public void LoadLevelFromFile()
+    {
+        string path = GetFilePath();
+
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+
+            // Convertiamo da testo a Oggetto
+            LevelData data = JsonUtility.FromJson<LevelData>(json);
+
+            // Sovrascriviamo le variabili dello script
+            this.levelName = data.levelName;
+            this.positionTolerance = data.posTolerance;
+            this.rotationTolerance = data.rotTolerance;
+            this.savedSolution = data.goals;
+
+            Debug.Log($"Livello '{this.levelName}' caricato con successo dal file JSON!");
+        }
+        else
+        {
+            Debug.LogError($"Impossibile caricare: File non trovato al percorso {path}");
+        }
+    }
+
+    // Funzione helper per decidere dove salvare i file
+    private string GetFilePath()
+    {
+#if UNITY_EDITOR
+        // In Editor salviamo in una cartella "Levels" dentro Assets, così li vedi
+        string folder = Path.Combine(Application.dataPath, "Levels");
+        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+        return Path.Combine(folder, jsonFileName + ".json");
+#else
+        // Nel gioco finale (Android/PC Build) usiamo la cartella dei dati persistenti
+        return Path.Combine(Application.persistentDataPath, jsonFileName + ".json");
+#endif
     }
 }

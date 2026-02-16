@@ -221,6 +221,7 @@ MonoBehaviour:
   - {fileID: 1392402579}
   positionTolerance: 0.05
   rotationTolerance: 15
+  jsonFileName: Tangram_cigno
   savedSolution:
   - pieceTag: triangle_big
     relPosition: {x: -0.06759979, y: -0.21057637, z: -0.000000015882836}

@@ -45,3 +45,7 @@ ExportedObj/
 # File di crash e debug
 sysinfo.txt
 crashlytics-build.properties
+
+# Cartella locale di Continue (indici e cache)
+.continue/
+.continueignore
